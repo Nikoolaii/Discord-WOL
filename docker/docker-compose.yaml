@@ -1,0 +1,7 @@
+services:
+   discordbot:
+    build: .
+    container_name: discordbot
+    volumes:
+      - "../:/app"
+    network_mode: "host"
