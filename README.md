@@ -29,21 +29,34 @@ The objective of this bot is to send a wake on lan command with a discord bot
 
 ## ⭐️ Features
 
-1. **/wake**
+1. **/init**
 
-Send a wake command to up a computer
+Send the message to the discord server that the bot is ready to use, this message will have a button to wake up the computer
 
-2. **/show**
+2. **/setlogs**
 
-Show all computer that can be up with the command
+Set the logs channel for the bot, the bot will send all the logs in this channel
 
+3. **/setmacaddress**
 
+Set the mac address of the computer you want to wake up
 
 ## 🛠 Stack Tech
 - [![Python][Python-badge]][Python-url] - A general-purpose programming language
 
 [Python-badge]: https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54
 [Python-url]: https://www.python.org/}
+
+- [![Discord][Discord-badge]][Discord-url] - A VoIP, instant messaging and digital distribution platform designed for creating communities
+
+[Discord-badge]: https://img.shields.io/badge/discord-5865F2?style=for-the-badge&logo=discord&logoColor=white
+[Discord-url]: https://discord.com/
+
+- [![SQLite][SQLite-badge]][SQLite-url] - A C-language library that implements a small, fast, self-contained, high-reliability, full-featured, SQL database engine
+
+[SQLite-badge]: https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&logo=sqlite&logoColor=white
+[SQLite-url]: https://www.sqlite.org/index.html
+
 
 
 ## ⚙ ️Setup
@@ -54,11 +67,15 @@ To install this project, follow these steps:
 
 1. Clone the repo on your server
 
-2. Fill the document list.json with all the computer you want to up with a wake on lan request
+2. Install all dependencies with the following command:
 
-3. Fill the file .env with you discord application token and the discord server id you want the bot work with 
+```bash
+pip install -r requirements.txt
+```
 
-4. Add your discord application on a personnal server only you and persons who need to have access to the /wake command
+3. Fill the file .env with you discord application token 
+
+4. Add your discord application on a server
 
 
 
