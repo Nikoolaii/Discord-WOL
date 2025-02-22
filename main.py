@@ -1,50 +1,26 @@
 import nextcord
-import json
 from nextcord.ext import commands
 from dotenv import load_dotenv
 import os
-from wakeonlan import send_magic_packet
+from controller.database import Database
 
 # Charger les variables d'environnement depuis le fichier .env
 load_dotenv()
 DISCORD_BOT_TOKEN = os.getenv('DISCORD_BOT_TOKEN')
-TESTING_GUILD_ID = os.getenv('TESTING_GUILD_ID')
 
 bot = commands.Bot()
 
 @bot.event
 async def on_ready():
     print(f'We have logged in as {bot.user}')
+    # Appeler la méthode on_ready de chaque cog
+    for cog in bot.cogs.values():
+        if hasattr(cog, 'on_ready'):
+            await cog.on_ready()
 
-@bot.slash_command(description="Show all id with the name", guild_ids=[TESTING_GUILD_ID])
-async def show(interaction: nextcord.Interaction):
-    with open('list.json', 'r') as f:
-        data = json.load(f)
-    embed = nextcord.Embed(title="List of ID", description="List of ID with the name", color=nextcord.Color.green())
-    for id, name in data.items():
-        embed.add_field(name=id, value=name, inline=False)
-    await interaction.response.send_message(embed=embed)
-
-@bot.slash_command(description="Wake a device on LAN", guild_ids=[TESTING_GUILD_ID])
-async def wake(interaction: nextcord.Interaction, name: str = nextcord.SlashOption(choices=[])):
-    try:
-        with open('list.json', 'r') as f:
-            data = json.load(f)
-        choices = list(data.keys())
-        if name not in choices:
-            await interaction.response.send_message(f"Invalid choice: {name}")
-            return
-        mac = data[name]
-        send_magic_packet(mac)
-        await interaction.response.send_message(f"Magic packet sent to {name}")
-    except Exception as e:
-        await interaction.response.send_message(f"Failed to send magic packet: {e}")
-
-@wake.on_autocomplete("name")
-async def autocomplete_name(interaction: nextcord.Interaction, name: str):
-    with open('list.json', 'r') as f:
-        data = json.load(f)
-    choices = list(data.keys())
-    await interaction.response.send_autocomplete(choices)
+# Charger les commandes depuis le dossier commands
+for filename in os.listdir('./commands'):
+    if filename.endswith('.py'):
+        bot.load_extension(f'commands.{filename[:-3]}')
 
 bot.run(DISCORD_BOT_TOKEN)
