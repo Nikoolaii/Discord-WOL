@@ -6,10 +6,10 @@ from datetime import datetime
 
 class StartButton(nextcord.ui.View):
     def __init__(self, db):
-        super().__init__()
+        super().__init__(timeout=None)  # Pas de timeout pour garder le bouton actif
         self.db = db
 
-    @nextcord.ui.button(label="Démarrer", style=nextcord.ButtonStyle.green)
+    @nextcord.ui.button(label="Démarrer", style=nextcord.ButtonStyle.green, custom_id="wol_start_button")
     async def start_button(self, button: nextcord.ui.Button, interaction: nextcord.Interaction):
         # Récupérer l'adresse MAC depuis la base de données
         select_mac_query = "SELECT mac_address FROM mac_address WHERE user_id = ?"
@@ -35,6 +35,8 @@ class InitCommand(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.db = Database()
+        # Ajouter la vue persistante au bot
+        self.bot.add_view(StartButton(self.db))
 
     @nextcord.slash_command(description='Initialisation of the bot')
     async def init(self, interaction: nextcord.Interaction):
@@ -53,6 +55,7 @@ class InitCommand(commands.Cog):
         insert_message_query = "INSERT OR REPLACE INTO messages (message_id, channel_id, server_id) VALUES (?, ?, ?)"
         self.db.execute_query(insert_message_query, (str(message.id), str(interaction.channel_id), str(interaction.guild_id)))
 
+    @commands.Cog.listener()
     async def on_ready(self):
         # Fetch the message ID and channel ID from the database
         select_query = "SELECT message_id, channel_id FROM messages"
