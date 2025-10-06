@@ -35,8 +35,6 @@ class InitCommand(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.db = Database()
-        # Ajouter la vue persistante au bot
-        self.bot.add_view(StartButton(self.db))
 
     @nextcord.slash_command(description='Initialisation of the bot')
     async def init(self, interaction: nextcord.Interaction):
@@ -57,9 +55,20 @@ class InitCommand(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        # Fetch the message ID and channel ID from the database
-        select_query = "SELECT message_id, channel_id FROM messages"
-        messages = self.db.execute_read_query(select_query)
+        # Ajouter la vue persistante au bot (maintenant que la boucle d'événements est active)
+        self.bot.add_view(StartButton(self.db))
+        
+        # Créer la table messages si elle n'existe pas
+        self.db.create_table('messages', ['message_id TEXT PRIMARY KEY', 'channel_id TEXT', 'server_id TEXT UNIQUE'])
+        
+        # Vérifier si la table existe avant de la requêter
+        check_table_query = "SELECT name FROM sqlite_master WHERE type='table' AND name='messages'"
+        table_exists = self.db.execute_read_query(check_table_query)
+        
+        if table_exists:
+            # Fetch the message ID and channel ID from the database
+            select_query = "SELECT message_id, channel_id FROM messages"
+            messages = self.db.execute_read_query(select_query)
         if messages:
             for message_id, channel_id in messages:
                 channel = self.bot.get_channel(int(channel_id))
